@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var order = Order()
+    @StateObject var orderManager = OrderManager()
     
     var body: some View {
         NavigationView {
@@ -16,27 +16,27 @@ struct ContentView: View {
             
             Form {
                 Section {
-                    Picker("Select your cake type", selection: $order.type) {
-                        ForEach(Order.types.indices) {
-                            Text(Order.types[$0])
+                    Picker("Select your cake type", selection: $orderManager.order.type) {
+                        ForEach(OrderManager.types.indices, id: \.self) {
+                            Text(OrderManager.types[$0])
                         }
                     }
                     
-                    Stepper("Number of cakes: \(order.quantity)", value: $order.quantity, in: 3...20)
+                    Stepper("Number of cakes: \(orderManager.order.quantity)", value: $orderManager.order.quantity, in: 3...20)
                 }
                 
                 Section {
-                    Toggle("Any special requests?", isOn: $order.specialRequestEnabled.animation())
+                    Toggle("Any special requests?", isOn: $orderManager.order.specialRequestEnabled.animation())
                     
-                    if (order.specialRequestEnabled) {
-                        Toggle("Add extra Frosting", isOn: $order.extraFrosting)
-                        Toggle("Add sprinkles", isOn: $order.addSprinkles)
+                    if (orderManager.order.specialRequestEnabled) {
+                        Toggle("Add extra Frosting", isOn: $orderManager.order.extraFrosting)
+                        Toggle("Add sprinkles", isOn: $orderManager.order.addSprinkles)
                     }
                 }
                 
                 Section {
                     NavigationLink {
-                        AddressView(order: order)
+                        AddressView(orderManager: orderManager)
                     } label: {
                         Text("Delivery details")
                     }

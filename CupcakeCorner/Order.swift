@@ -7,7 +7,66 @@
 
 import SwiftUI
 
-class Order: ObservableObject, Codable {
+
+struct Order: Codable {
+    var type = 0
+    var quantity = 3
+    
+    var specialRequestEnabled = false {
+        didSet {
+            if (!specialRequestEnabled) {
+                extraFrosting = false
+                addSprinkles = false
+            }
+        }
+    }
+    var extraFrosting = false
+    var addSprinkles = false
+    
+    var name = ""
+    var streetAddress = ""
+    var city = ""
+    var zip = ""
+    
+    var hasValidAddress: Bool {
+        !(
+            name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || streetAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || zip.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        )
+    }
+    
+    var cost: Double {
+        // $2 per cake
+        var cost = Double(quantity) * 2
+        
+        // complicated cakes cost more
+        cost += (Double(type) / 2)
+        
+        // $1/cake for etra frosting
+        if extraFrosting {
+            cost += Double(quantity)
+        }
+        
+        // $0.50/cake for sprinkles
+        if addSprinkles {
+            cost += Double(quantity) / 2
+        }
+        
+        return cost
+    }
+}
+
+class OrderManager: ObservableObject {
+    static let types = ["Vanilla", "Strawberry", "Chocolate", "Rainbow"]
+    
+    @Published var order = Order()
+}
+
+
+// CLASS OBSERVABLE CODABLE
+class OrderPrev: ObservableObject, Codable {
     enum CodingKeys: CodingKey {
         case type, quantity, extraFrosting, addSprinkles, name, streetAddress, city, zip
     }
@@ -34,7 +93,12 @@ class Order: ObservableObject, Codable {
     @Published var zip = ""
     
     var hasValidAddress: Bool {
-        !(name.isEmpty || streetAddress.isEmpty || city.isEmpty || zip.isEmpty)
+        !(
+            name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || streetAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || zip.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        )
     }
     
     var cost: Double {
